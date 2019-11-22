@@ -1,7 +1,7 @@
 import tensorflow as tf
 import sys
 from ReadData import *
-
+tf.keras.backend.set_floatx('float64')
 class MLP(tf.keras.Model):
     def __init__(self,nodes,output_dim):
         super(MLP,self).__init__()
