@@ -1,8 +1,9 @@
-import tensorflow as tf
+import tensorflow_core as tf
 from ReadData import *
 import sys
 
 #https://github.com/dwyl/english-words
+tf.keras.backend.set_floatx('float32')
 
 class RNN_M2M(tf.keras.Model):
     def __init__(self,max_input_idx,embedding_dim, nodes, output_dim):
@@ -108,19 +109,20 @@ class NGram:
 
         #pred is 1,1,Nc
         pred = np.squeeze(pred,axis=1)#1,Nc
-        last_step_idx = np.argmax(pred, axis=-1)
-        predicted_string += idxmap[last_step_idx]
-        init_input = tf.expand_dims([last_step_idx],axis=0)
-        for t in range(nbchars-1):
-            pred, layer_output, final_state = self.network(init_input, initial_state=init_state)
-            last_step_pred = pred[:,-1,:]
-            last_step_idx = tf.argmax(last_step_pred,axis=-1)
-            init_input = tf.expand_dims(last_step_idx,axis=1)
-            predicted_idx = last_step_idx.numpy()[0]
-            predicted_string += idxmap[predicted_idx]
-        # class_prediction = tf.argmax(pred,axis=-1)
-        pred = np.squeeze(pred,axis=1)
-        return predicted_string,pred
+        if(nbchars-1>0):
+            last_step_idx = np.argmax(pred[0], axis=-1)
+            predicted_string += idxmap[last_step_idx]
+            init_input = tf.expand_dims([last_step_idx],axis=0)
+            for t in range(nbchars-1):
+                pred, layer_output, final_state = self.network(init_input, initial_state=init_state)
+                last_step_pred = pred[:,-1,:]
+                last_step_idx = tf.argmax(last_step_pred,axis=-1)
+                init_input = tf.expand_dims(last_step_idx,axis=1)
+                predicted_idx = last_step_idx.numpy()[0]
+                predicted_string += idxmap[predicted_idx]
+            # class_prediction = tf.argmax(pred,axis=-1)
+            pred = np.squeeze(pred,axis=1)
+        return predicted_string,pred[0]
 
 
 
@@ -131,7 +133,7 @@ words, wl = load_words_from_file("Data/train_words.txt")
 net = NGram(len(charmap)-1,64,[128,128],len(charmap))
 # net.train(words,wl,charmap,epochs=EPOCHS,batch_size=64,resume=True)
 
-teststring = "lic"
+teststring = "qu"
 prediction,prob = net.predict(teststring,2,charmap,idxmap)
 print(prediction)
 plot_character_probability(prob,charlist)
