@@ -1,4 +1,4 @@
-import numpy as np
+from ReadData import *
 import matplotlib.pyplot as plt
 
 
@@ -98,6 +98,15 @@ def plot_character_probability(prediction,characters):
     plt.bar(chars,prediction)
     plt.xticks(chars,characters)
     plt.savefig('NGram.png')
+    plt.show()
+
+def plotImages(images_arr):
+    fig, axes = plt.subplots(1, 5, figsize=(20,20))
+    axes = axes.flatten()
+    for img, ax in zip( images_arr, axes):
+        ax.imshow(img)
+        ax.axis('off')
+    plt.tight_layout()
     plt.show()
 
 # X,Y,labels = read_data('Data/spiral.txt',separator="\t")
