@@ -1,7 +1,7 @@
 import tensorflow as tf
-import numpy as np
+from ReadData import plotImages
 import sys
-
+import numpy as np
 
 class CNN(tf.keras.Model):
     def __init__(self,filters,nbclass):
@@ -55,7 +55,7 @@ class Image_Classifier:
             start = 0
             for b in range(nbbatches):
                 end = min(start+batch_size,total)
-                b_x = X[start:end].astype('float32')
+                b_x = np.expand_dims(X[start:end],-1).astype('float32')
                 b_y = Y[start:end]
                 b_loss,b_acc = self.train_step(b_x,b_y)
                 epoch_loss += b_loss
@@ -68,12 +68,9 @@ class Image_Classifier:
             print("Epoch %d/%d Loss %.4f, Acc %0.4f"%(e,epochs,epoch_loss,epoch_acc))
 
 
-(x, y), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+# (x, y), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+(x, y), (x_test, y_test) = tf.keras.datasets.fashion_mnist.load_data()
 print(x.shape,y.shape)
-
+plotImages(x_test[:5])
 model = Image_Classifier([16,32,64],10)
 model.train(x,y,50,128)
-
-
-
-
